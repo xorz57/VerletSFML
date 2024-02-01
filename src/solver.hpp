@@ -1,9 +1,9 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
+
 #include <cmath>
 #include <vector>
-
-#include "math.hpp"
 
 struct VerletObject {
   sf::Vector2f position;

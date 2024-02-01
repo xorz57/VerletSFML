@@ -1,9 +1,9 @@
+#include <SFML/Graphics.hpp>
+
 #include "math.hpp"
 #include "number_generator.hpp"
 #include "renderer.hpp"
 #include "solver.hpp"
-#include <SFML/Graphics.hpp>
-#include <iostream>
 
 static sf::Color getRainbow(float t) {
   const float r = sin(t);
