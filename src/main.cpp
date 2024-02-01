@@ -2,8 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include "solver.hpp"
 #include "renderer.hpp"
-#include "utils/number_generator.hpp"
-#include "utils/math.hpp"
+#include "number_generator.hpp"
+#include "math.hpp"
 
 
 static sf::Color getRainbow(float t)

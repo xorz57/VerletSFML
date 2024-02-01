@@ -3,7 +3,7 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
-#include "utils/math.hpp"
+#include "math.hpp"
 
 
 struct VerletObject

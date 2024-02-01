@@ -1,16 +1,23 @@
-cmake_minimum_required(VERSION 3.10)
-set(PROJECT_NAME Verlet)
-project(${PROJECT_NAME} VERSION 1.0.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.26)
 
-set(SOURCES main.cpp)
+project(VerletSFML)
 
-# Detect and add SFML
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
-find_package(SFML 2 REQUIRED COMPONENTS network audio graphics window system)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(VCPKG_TARGET_TRIPLET MATCHES "-static$")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
+find_package(glm REQUIRED)
+find_package(SFML 2.5.0 COMPONENTS system window graphics REQUIRED)
+
+set(SOURCES src/main.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics)
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
-if (UNIX)
-   target_link_libraries(${PROJECT_NAME} pthread)
-endif (UNIX)
+
+target_include_directories(${PROJECT_NAME} PRIVATE include)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
+target_link_libraries(${PROJECT_NAME} PRIVATE sfml-system sfml-window sfml-graphics)
