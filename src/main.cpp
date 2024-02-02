@@ -18,25 +18,11 @@ static sf::Color getRainbow(float t)
 
 int main()
 {
-    // Create window
-    constexpr int32_t window_width = 1000;
-    constexpr int32_t window_height = 1000;
-
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 1;
-    sf::RenderWindow window(sf::VideoMode(window_width, window_height), "VerletSFML", sf::Style::Default, settings);
-    const uint32_t frame_rate = 60;
-    window.setFramerateLimit(frame_rate);
-
     Solver solver;
-    Renderer renderer{window};
-
-    // Solver configuration
-    solver.setConstraint({static_cast<float>(window_width) * 0.5f, static_cast<float>(window_height) * 0.5f}, 450.0f);
+    solver.setConstraint({0.5f * 1000.0f, 0.5f * 1000.0f}, 450.0f);
     solver.setSubStepsCount(8);
-    solver.setSimulationUpdateRate(frame_rate);
+    solver.setSimulationUpdateRate(60u);
 
-    // Set simulation attributes
     const float object_spawn_delay = 0.025f;
     const float object_spawn_speed = 1200.0f;
     const sf::Vector2f object_spawn_position = {500.0f, 200.0f};
@@ -45,8 +31,16 @@ int main()
     const uint32_t max_objects_count = 1000;
     const float max_angle = 1.0f;
 
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 1;
+
+    sf::RenderWindow window(sf::VideoMode(1000u, 1000u), "VerletSFML", sf::Style::Default, settings);
+    window.setFramerateLimit(60u);
+
+    Renderer renderer{window};
+
     sf::Clock clock;
-    // Main loop
+
     while (window.isOpen())
     {
         sf::Event event{};
