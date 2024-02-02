@@ -1,6 +1,5 @@
 #include <SFML/Graphics.hpp>
 
-#include "math.hpp"
 #include "number_generator.hpp"
 #include "renderer.hpp"
 #include "solver.hpp"
