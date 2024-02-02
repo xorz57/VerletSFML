@@ -7,7 +7,6 @@
 
 struct VerletObject
 {
-    VerletObject() = default;
     VerletObject(sf::Vector2f position_, float radius_) : position{position_}, position_last{position_}, radius{radius_} {}
 
     void update(float dt)
@@ -25,15 +24,8 @@ struct VerletObject
         position_last = position - (v * dt);
     }
 
-    void addVelocity(sf::Vector2f v, float dt) { position_last -= v * dt; }
-
-    [[nodiscard]] sf::Vector2f getVelocity(float dt) const
-    {
-        return (position - position_last) / dt;
-    }
-
-    sf::Vector2f position;
-    sf::Vector2f position_last;
+    sf::Vector2f position{0.0f, 0.0f};
+    sf::Vector2f position_last{0.0f, 0.0f};
     sf::Vector2f acceleration{0.0f, 0.0f};
     float radius = 10.0f;
     sf::Color color = sf::Color::White;
@@ -46,14 +38,14 @@ public:
 
     VerletObject &addObject(sf::Vector2f position, float radius)
     {
-        return m_objects.emplace_back(position, radius);
+        return mVerletObjects.emplace_back(position, radius);
     }
 
     void update()
     {
-        m_time += m_frame_dt;
+        mTime += mFrameDt;
         const float step_dt = getStepDt();
-        for (uint32_t i{m_sub_steps}; i--;)
+        for (uint32_t i{mSubSteps}; i--;)
         {
             applyGravity();
             checkCollisions(step_dt);
@@ -64,16 +56,16 @@ public:
 
     void setSimulationUpdateRate(uint32_t rate)
     {
-        m_frame_dt = 1.0f / static_cast<float>(rate);
+        mFrameDt = 1.0f / static_cast<float>(rate);
     }
 
     void setConstraint(sf::Vector2f position, float radius)
     {
-        m_constraint_center = position;
-        m_constraint_radius = radius;
+        mConstraintCenter = position;
+        mConstraintRadius = radius;
     }
 
-    void setSubStepsCount(uint32_t sub_steps) { m_sub_steps = sub_steps; }
+    void setSubStepsCount(uint32_t sub_steps) { mSubSteps = sub_steps; }
 
     void setObjectVelocity(VerletObject &object, sf::Vector2f v) const
     {
@@ -82,44 +74,44 @@ public:
 
     [[nodiscard]] const std::vector<VerletObject> &getObjects() const
     {
-        return m_objects;
+        return mVerletObjects;
     }
 
     [[nodiscard]] sf::Vector3f getConstraint() const
     {
-        return {m_constraint_center.x, m_constraint_center.y, m_constraint_radius};
+        return {mConstraintCenter.x, mConstraintCenter.y, mConstraintRadius};
     }
 
-    [[nodiscard]] uint64_t getObjectsCount() const { return m_objects.size(); }
+    [[nodiscard]] uint64_t getObjectsCount() const { return mVerletObjects.size(); }
 
-    [[nodiscard]] float getTime() const { return m_time; }
+    [[nodiscard]] float getTime() const { return mTime; }
 
     [[nodiscard]] float getStepDt() const
     {
-        return m_frame_dt / static_cast<float>(m_sub_steps);
+        return mFrameDt / static_cast<float>(mSubSteps);
     }
 
 private:
     void applyGravity()
     {
-        for (auto &obj : m_objects)
+        for (auto &obj : mVerletObjects)
         {
-            obj.accelerate(m_gravity);
+            obj.accelerate(mGravity);
         }
     }
 
     void checkCollisions(float)
     {
         const float response_coef = 0.75f;
-        const uint64_t objects_count = m_objects.size();
+        const uint64_t objects_count = mVerletObjects.size();
         // Iterate on all objects
         for (uint64_t i{0}; i < objects_count; ++i)
         {
-            VerletObject &object_1 = m_objects[i];
+            VerletObject &object_1 = mVerletObjects[i];
             // Iterate on object involved in new collision pairs
             for (uint64_t k{i + 1}; k < objects_count; ++k)
             {
-                VerletObject &object_2 = m_objects[k];
+                VerletObject &object_2 = mVerletObjects[k];
                 const sf::Vector2f v = object_1.position - object_2.position;
                 const float dist2 = v.x * v.x + v.y * v.y;
                 const float min_dist = object_1.radius + object_2.radius;
@@ -143,32 +135,32 @@ private:
 
     void applyConstraint()
     {
-        for (auto &obj : m_objects)
+        for (auto &obj : mVerletObjects)
         {
-            const sf::Vector2f v = m_constraint_center - obj.position;
+            const sf::Vector2f v = mConstraintCenter - obj.position;
             const float dist = sqrt(v.x * v.x + v.y * v.y);
-            if (dist > (m_constraint_radius - obj.radius))
+            if (dist > (mConstraintRadius - obj.radius))
             {
                 const sf::Vector2f n = v / dist;
                 obj.position =
-                    m_constraint_center - n * (m_constraint_radius - obj.radius);
+                    mConstraintCenter - n * (mConstraintRadius - obj.radius);
             }
         }
     }
 
     void updateObjects(float dt)
     {
-        for (auto &obj : m_objects)
+        for (auto &obj : mVerletObjects)
         {
             obj.update(dt);
         }
     }
 
-    uint32_t m_sub_steps = 1;
-    sf::Vector2f m_gravity = {0.0f, 1000.0f};
-    sf::Vector2f m_constraint_center;
-    float m_constraint_radius = 100.0f;
-    std::vector<VerletObject> m_objects;
-    float m_time = 0.0f;
-    float m_frame_dt = 0.0f;
+    uint32_t mSubSteps = 1;
+    sf::Vector2f mGravity = {0.0f, 1000.0f};
+    sf::Vector2f mConstraintCenter{0.0f, 0.0f};
+    float mConstraintRadius = 100.0f;
+    std::vector<VerletObject> mVerletObjects;
+    float mTime = 0.0f;
+    float mFrameDt = 0.0f;
 };
