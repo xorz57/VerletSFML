@@ -6,7 +6,7 @@
 
 #include <glm/gtc/constants.hpp>
 
-static sf::Color getRainbow(float t)
+static sf::Color GetRainbow(float t)
 {
     const float r = sin(t);
     const float g = sin(t + 0.33f * 2.0f * glm::pi<float>());
@@ -15,6 +15,39 @@ static sf::Color getRainbow(float t)
         static_cast<uint8_t>(255.0f * r * r),
         static_cast<uint8_t>(255.0f * g * g),
         static_cast<uint8_t>(255.0f * b * b)};
+}
+
+void HandleEventClosed(sf::Window &window, const sf::Event &)
+{
+    window.close();
+}
+
+void HandleEventKeyPressed(sf::Window &window, const sf::Event &event)
+{
+    if (event.key.code == sf::Keyboard::Escape)
+    {
+        window.close();
+        return;
+    }
+}
+
+void ProcessEvents(sf::Window &window)
+{
+    sf::Event event{};
+    while (window.pollEvent(event))
+    {
+        switch (event.type)
+        {
+        case sf::Event::Closed:
+            HandleEventClosed(window, event);
+            break;
+        case sf::Event::KeyPressed:
+            HandleEventKeyPressed(window, event);
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 int main()
@@ -44,14 +77,7 @@ int main()
 
     while (window.isOpen())
     {
-        sf::Event event{};
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-            {
-                window.close();
-            }
-        }
+        ProcessEvents(window);
 
         if (solver.getObjectsCount() < max_objects_count && clock.getElapsedTime().asSeconds() >= object_spawn_delay)
         {
@@ -60,10 +86,11 @@ int main()
             const float t = solver.getTime();
             const float angle = max_angle * sin(t) + glm::pi<float>() * 0.5f;
             solver.setObjectVelocity(object, object_spawn_speed * sf::Vector2f{cos(angle), sin(angle)});
-            object.color = getRainbow(t);
+            object.color = GetRainbow(t);
         }
 
         solver.update();
+
         window.clear(sf::Color::White);
         renderer.render(solver);
         window.display();
