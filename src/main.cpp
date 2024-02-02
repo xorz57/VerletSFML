@@ -5,11 +5,13 @@
 #include "renderer.hpp"
 #include "solver.hpp"
 
+#include <glm/gtc/constants.hpp>
+
 static sf::Color getRainbow(float t)
 {
     const float r = sin(t);
-    const float g = sin(t + 0.33f * 2.0f * Math::PI);
-    const float b = sin(t + 0.66f * 2.0f * Math::PI);
+    const float g = sin(t + 0.33f * 2.0f * glm::pi<float>());
+    const float b = sin(t + 0.66f * 2.0f * glm::pi<float>());
     return {
         static_cast<uint8_t>(255.0f * r * r),
         static_cast<uint8_t>(255.0f * g * g),
@@ -57,7 +59,7 @@ int main()
             clock.restart();
             auto &object = solver.addObject(object_spawn_position, RNGf::getRange(object_min_radius, object_max_radius));
             const float t = solver.getTime();
-            const float angle = max_angle * sin(t) + Math::PI * 0.5f;
+            const float angle = max_angle * sin(t) + glm::pi<float>() * 0.5f;
             solver.setObjectVelocity(object, object_spawn_speed * sf::Vector2f{cos(angle), sin(angle)});
             object.color = getRainbow(t);
         }
