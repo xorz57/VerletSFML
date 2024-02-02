@@ -7,25 +7,14 @@
 
 struct VerletObject
 {
-    sf::Vector2f position;
-    sf::Vector2f position_last;
-    sf::Vector2f acceleration{0.0f, 0.0f};
-    float radius = 10.0f;
-    sf::Color color = sf::Color::White;
-
     VerletObject() = default;
-    VerletObject(sf::Vector2f position_, float radius_)
-        : position{position_}, position_last{position_},
-          radius{radius_} {}
+    VerletObject(sf::Vector2f position_, float radius_) : position{position_}, position_last{position_}, radius{radius_} {}
 
     void update(float dt)
     {
-        // Compute how much we moved
         const sf::Vector2f displacement = position - position_last;
-        // Update position
         position_last = position;
         position = position + displacement + acceleration * (dt * dt);
-        // Reset acceleration
         acceleration = {};
     }
 
@@ -42,6 +31,12 @@ struct VerletObject
     {
         return (position - position_last) / dt;
     }
+
+    sf::Vector2f position;
+    sf::Vector2f position_last;
+    sf::Vector2f acceleration{0.0f, 0.0f};
+    float radius = 10.0f;
+    sf::Color color = sf::Color::White;
 };
 
 class Solver
@@ -105,14 +100,6 @@ public:
     }
 
 private:
-    uint32_t m_sub_steps = 1;
-    sf::Vector2f m_gravity = {0.0f, 1000.0f};
-    sf::Vector2f m_constraint_center;
-    float m_constraint_radius = 100.0f;
-    std::vector<VerletObject> m_objects;
-    float m_time = 0.0f;
-    float m_frame_dt = 0.0f;
-
     void applyGravity()
     {
         for (auto &obj : m_objects)
@@ -176,4 +163,12 @@ private:
             obj.update(dt);
         }
     }
+
+    uint32_t m_sub_steps = 1;
+    sf::Vector2f m_gravity = {0.0f, 1000.0f};
+    sf::Vector2f m_constraint_center;
+    float m_constraint_radius = 100.0f;
+    std::vector<VerletObject> m_objects;
+    float m_time = 0.0f;
+    float m_frame_dt = 0.0f;
 };
