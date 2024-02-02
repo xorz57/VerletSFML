@@ -17,8 +17,6 @@ struct VerletObject
         acceleration = {};
     }
 
-    void accelerate(sf::Vector2f a) { acceleration += a; }
-
     void setVelocity(sf::Vector2f v, float dt)
     {
         position_last = position - (v * dt);
@@ -94,9 +92,9 @@ public:
 private:
     void applyGravity()
     {
-        for (auto &obj : mVerletObjects)
+        for (auto &verletObject : mVerletObjects)
         {
-            obj.accelerate(mGravity);
+            verletObject.acceleration += mGravitationalAcceleration;
         }
     }
 
@@ -135,29 +133,29 @@ private:
 
     void applyConstraint()
     {
-        for (auto &obj : mVerletObjects)
+        for (auto &verletObject : mVerletObjects)
         {
-            const sf::Vector2f v = mConstraintCenter - obj.position;
+            const sf::Vector2f v = mConstraintCenter - verletObject.position;
             const float dist = sqrt(v.x * v.x + v.y * v.y);
-            if (dist > (mConstraintRadius - obj.radius))
+            if (dist > (mConstraintRadius - verletObject.radius))
             {
                 const sf::Vector2f n = v / dist;
-                obj.position =
-                    mConstraintCenter - n * (mConstraintRadius - obj.radius);
+                verletObject.position =
+                    mConstraintCenter - n * (mConstraintRadius - verletObject.radius);
             }
         }
     }
 
     void updateObjects(float dt)
     {
-        for (auto &obj : mVerletObjects)
+        for (auto &verletObject : mVerletObjects)
         {
-            obj.update(dt);
+            verletObject.update(dt);
         }
     }
 
     uint32_t mSubSteps = 1;
-    sf::Vector2f mGravity = {0.0f, 1000.0f};
+    sf::Vector2f mGravitationalAcceleration{0.0f, 1000.0f};
     sf::Vector2f mConstraintCenter{0.0f, 0.0f};
     float mConstraintRadius = 100.0f;
     std::vector<VerletObject> mVerletObjects;
