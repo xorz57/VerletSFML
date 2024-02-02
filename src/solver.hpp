@@ -101,29 +101,23 @@ private:
     void checkCollisions(float)
     {
         const float response_coef = 0.75f;
-        const uint64_t objects_count = mVerletObjects.size();
-        // Iterate on all objects
-        for (uint64_t i{0}; i < objects_count; ++i)
+
+        for (size_t i = 0; i < mVerletObjects.size(); ++i)
         {
             VerletObject &object_1 = mVerletObjects[i];
-            // Iterate on object involved in new collision pairs
-            for (uint64_t k{i + 1}; k < objects_count; ++k)
+            for (size_t k = i + 1; k < mVerletObjects.size(); ++k)
             {
                 VerletObject &object_2 = mVerletObjects[k];
                 const sf::Vector2f v = object_1.position - object_2.position;
                 const float dist2 = v.x * v.x + v.y * v.y;
                 const float min_dist = object_1.radius + object_2.radius;
-                // Check overlapping
                 if (dist2 < min_dist * min_dist)
                 {
                     const float dist = sqrt(dist2);
                     const sf::Vector2f n = v / dist;
-                    const float mass_ratio_1 =
-                        object_1.radius / (object_1.radius + object_2.radius);
-                    const float mass_ratio_2 =
-                        object_2.radius / (object_1.radius + object_2.radius);
+                    const float mass_ratio_1 = object_1.radius / (object_1.radius + object_2.radius);
+                    const float mass_ratio_2 = object_2.radius / (object_1.radius + object_2.radius);
                     const float delta = 0.5f * response_coef * (dist - min_dist);
-                    // Update positions
                     object_1.position -= n * (mass_ratio_2 * delta);
                     object_2.position += n * (mass_ratio_1 * delta);
                 }
@@ -140,8 +134,7 @@ private:
             if (dist > (mConstraintRadius - verletObject.radius))
             {
                 const sf::Vector2f n = v / dist;
-                verletObject.position =
-                    mConstraintCenter - n * (mConstraintRadius - verletObject.radius);
+                verletObject.position = mConstraintCenter - n * (mConstraintRadius - verletObject.radius);
             }
         }
     }
