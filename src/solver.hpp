@@ -9,13 +9,13 @@ struct VerletObject
 {
     sf::Vector2f position;
     sf::Vector2f position_last;
-    sf::Vector2f acceleration;
+    sf::Vector2f acceleration{0.0f, 0.0f};
     float radius = 10.0f;
     sf::Color color = sf::Color::White;
 
     VerletObject() = default;
     VerletObject(sf::Vector2f position_, float radius_)
-        : position{position_}, position_last{position_}, acceleration{0.0f, 0.0f},
+        : position{position_}, position_last{position_},
           radius{radius_} {}
 
     void update(float dt)
@@ -80,7 +80,7 @@ public:
 
     void setSubStepsCount(uint32_t sub_steps) { m_sub_steps = sub_steps; }
 
-    void setObjectVelocity(VerletObject &object, sf::Vector2f v)
+    void setObjectVelocity(VerletObject &object, sf::Vector2f v) const
     {
         object.setVelocity(v, getStepDt());
     }
@@ -121,7 +121,7 @@ private:
         }
     }
 
-    void checkCollisions(float dt)
+    void checkCollisions(float)
     {
         const float response_coef = 0.75f;
         const uint64_t objects_count = m_objects.size();
