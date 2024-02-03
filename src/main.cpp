@@ -90,7 +90,6 @@ int main()
 
         window.clear(sf::Color::White);
 
-        // Render constraint
         const sf::Vector3f constraint = solver.getConstraint();
         sf::CircleShape constraint_background{constraint.z};
         constraint_background.setOrigin(constraint.z, constraint.z);
@@ -99,15 +98,14 @@ int main()
         constraint_background.setPointCount(128);
         window.draw(constraint_background);
 
-        // Render objects
         sf::CircleShape circle{1.0f};
         circle.setPointCount(32);
         circle.setOrigin(1.0f, 1.0f);
-        for (const auto &obj : solver.getObjects())
+        for (const auto &verletObject : solver.getObjects())
         {
-            circle.setPosition(obj.position);
-            circle.setScale(obj.radius, obj.radius);
-            circle.setFillColor(obj.color);
+            circle.setPosition(verletObject.position);
+            circle.setScale(verletObject.radius, verletObject.radius);
+            circle.setFillColor(verletObject.color);
             window.draw(circle);
         }
 
