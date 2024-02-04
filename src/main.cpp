@@ -13,7 +13,7 @@ struct VerletObject
                                                                position_last(position),
                                                                radius(radius) {}
 
-    void update(float dt)
+    void Update(float dt)
     {
         const sf::Vector2f displacement = position - position_last;
         position_last = position;
@@ -21,7 +21,7 @@ struct VerletObject
         acceleration = {};
     }
 
-    void setVelocity(sf::Vector2f v, float dt)
+    void SetVelocity(sf::Vector2f v, float dt)
     {
         position_last = position - (v * dt);
     }
@@ -79,18 +79,14 @@ void ProcessEvents(sf::Window &window)
 
 int main()
 {
-    uint32_t mSubSteps = 1;
     sf::Vector2f mGravitationalAcceleration{0.0f, 1000.0f};
-    sf::Vector2f mConstraintCenter{0.0f, 0.0f};
-    float mConstraintRadius = 100.0f;
     std::vector<VerletObject> mVerletObjects;
     float mTime = 0.0f;
-    float mFrameDt = 0.0f;
 
-    mConstraintCenter = {0.5f * 1000.0f, 0.5f * 1000.0f};
-    mConstraintRadius = 450.0f;
-    mSubSteps = 8;
-    mFrameDt = 1.0f / static_cast<float>(60u);
+    sf::Vector2f mConstraintCenter = {0.5f * 1000.0f, 0.5f * 1000.0f};
+    float mConstraintRadius = 450.0f;
+    uint32_t mSubSteps = 8;
+    float mFrameDt = 1.0f / static_cast<float>(60u);
 
     const float object_spawn_delay = 0.025f;
     const float object_spawn_speed = 1200.0f;
@@ -118,7 +114,7 @@ int main()
             auto &object = mVerletObjects.emplace_back(object_spawn_position, RNGf::getRange(object_min_radius, object_max_radius));
             const float t = mTime;
             const float angle = max_angle * sin(t) + glm::pi<float>() * 0.5f;
-            object.setVelocity(object_spawn_speed * sf::Vector2f{cos(angle), sin(angle)}, mFrameDt / static_cast<float>(mSubSteps));
+            object.SetVelocity(object_spawn_speed * sf::Vector2f{cos(angle), sin(angle)}, mFrameDt / static_cast<float>(mSubSteps));
             object.color = GetRainbow(t);
         }
 
@@ -165,7 +161,7 @@ int main()
             }
             for (auto &verletObject : mVerletObjects)
             {
-                verletObject.update(step_dt);
+                verletObject.Update(step_dt);
             }
         }
 
