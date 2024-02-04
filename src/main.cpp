@@ -9,7 +9,9 @@
 
 struct VerletObject
 {
-    VerletObject(sf::Vector2f position_, float radius_) : position{position_}, position_last{position_}, radius{radius_} {}
+    VerletObject(const sf::Vector2f &position, float radius) : position(position),
+                                                               position_last(position),
+                                                               radius(radius) {}
 
     void update(float dt)
     {
