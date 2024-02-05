@@ -164,7 +164,7 @@ int main()
             }
         }
 
-        window.clear(sf::Color::White);
+        window.clear(sf::Color(25, 25, 25));
 
         // Draw Constraint
         sf::CircleShape circle1;
