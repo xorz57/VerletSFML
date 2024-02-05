@@ -105,8 +105,8 @@ int main() {
             for (size_t i = 0; i < objects.size(); ++i) {
                 Object &object1 = objects[i];
 
-                for (size_t k = i + 1; k < objects.size(); ++k) {
-                    Object &object2 = objects[k];
+                for (size_t j = i + 1; j < objects.size(); ++j) {
+                    Object &object2 = objects[j];
 
                     const sf::Vector2f dPosition = object1.position - object2.position;
                     const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
@@ -114,10 +114,10 @@ int main() {
 
                     const float minDistance = object1.radius + object2.radius;
                     if (dPositionLength < minDistance) {
-                        const float massRatio1 = object1.radius / (object1.radius + object2.radius);
-                        const float massRatio2 = object2.radius / (object1.radius + object2.radius);
                         const float responseCoefficient = 0.75f;
                         const float delta = 0.5f * responseCoefficient * (dPositionLength - minDistance);
+                        const float massRatio1 = object1.radius / (object1.radius + object2.radius);
+                        const float massRatio2 = object2.radius / (object1.radius + object2.radius);
                         object1.position -= dPositionNormalized * (massRatio2 * delta);
                         object2.position += dPositionNormalized * (massRatio1 * delta);
                     }
