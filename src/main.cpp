@@ -2,9 +2,9 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-#include <cmath>
 #include <vector>
 
 struct Object
@@ -35,9 +35,9 @@ struct Object
 
 static sf::Color GetRainbow(float t)
 {
-    const float r = sin(t);
-    const float g = sin(t + 0.33f * 2.0f * glm::pi<float>());
-    const float b = sin(t + 0.66f * 2.0f * glm::pi<float>());
+    const float r = glm::sin(t);
+    const float g = glm::sin(t + 0.33f * 2.0f * glm::pi<float>());
+    const float b = glm::sin(t + 0.66f * 2.0f * glm::pi<float>());
     return {
         static_cast<uint8_t>(255.0f * r * r),
         static_cast<uint8_t>(255.0f * g * g),
@@ -79,28 +79,20 @@ void ProcessEvents(sf::Window &window)
 
 int main()
 {
-    sf::Vector2f gravitationalAcceleration{0.0f, 1000.0f};
+    sf::Vector2f gravitationalAcceleration(0.0f, 1'000.0f);
     std::vector<Object> objects;
+
+    sf::Vector2f constraintCenter(0.5f * 1'000.0f, 0.5f * 1'000.0f);
+    float constraintRadius = 450.0f;
+
+    sf::ContextSettings settings{24u, 8u, 8u, 3u, 3u};
+    sf::RenderWindow window(sf::VideoMode(1'000u, 1'000u), "VerletSFML", sf::Style::Default, settings);
+    window.setFramerateLimit(60u);
+
+    float frameDeltaTime = 1.0f / 60.0f;
     float time = 0.0f;
 
-    sf::Vector2f constraintCenter = {0.5f * 1000.0f, 0.5f * 1000.0f};
-    float constraintRadius = 450.0f;
     uint32_t subSteps = 8;
-    float frameDeltaTime = 1.0f / 60.0f;
-
-    const float objectSpawnDelay = 0.025f;
-    const float objectSpawnSpeed = 1200.0f;
-    const sf::Vector2f objectSpawnPosition = {500.0f, 200.0f};
-    const float objectMinRadius = 1.0f;
-    const float objectMaxRadius = 20.0f;
-    const uint32_t maxObjectsCount = 1000;
-    const float objectSpawnMaxAngle = 1.0f;
-
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 1;
-
-    sf::RenderWindow window(sf::VideoMode(1000u, 1000u), "VerletSFML", sf::Style::Default, settings);
-    window.setFramerateLimit(60u);
 
     sf::Clock clock;
 
@@ -108,19 +100,19 @@ int main()
     {
         ProcessEvents(window);
 
-        if (objects.size() < maxObjectsCount && clock.getElapsedTime().asSeconds() >= objectSpawnDelay)
+        if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f)
         {
             clock.restart();
-            auto &object = objects.emplace_back(objectSpawnPosition, RNGf::getRange(objectMinRadius, objectMaxRadius));
+            auto &object = objects.emplace_back(sf::Vector2f(500.0f, 200.0f), RNGf::getRange(1.0f, 20.0f));
             const float t = time;
-            const float angle = objectSpawnMaxAngle * sin(t) + glm::pi<float>() * 0.5f;
-            object.SetVelocity(objectSpawnSpeed * sf::Vector2f{cos(angle), sin(angle)}, frameDeltaTime / static_cast<float>(subSteps));
+            const float angle = 1.0f * glm::sin(t) + 0.5f * glm::pi<float>();
+            object.SetVelocity(1'200.0f * sf::Vector2f{glm::cos(angle), glm::sin(angle)}, frameDeltaTime / static_cast<float>(subSteps));
             object.color = GetRainbow(t);
         }
 
         time += frameDeltaTime;
         const float step_dt = frameDeltaTime / static_cast<float>(subSteps);
-        for (uint32_t i{subSteps}; i--;)
+        for (uint32_t i = subSteps; i--;)
         {
             for (auto &object : objects)
             {
@@ -152,10 +144,10 @@ int main()
             for (auto &object : objects)
             {
                 const sf::Vector2f v = constraintCenter - object.position;
-                const float dist = sqrt(v.x * v.x + v.y * v.y);
-                if (dist > (constraintRadius - object.radius))
+                const float distance = glm::sqrt(v.x * v.x + v.y * v.y);
+                if (distance > (constraintRadius - object.radius))
                 {
-                    const sf::Vector2f n = v / dist;
+                    const sf::Vector2f n = v / distance;
                     object.position = constraintCenter - n * (constraintRadius - object.radius);
                 }
             }
@@ -172,7 +164,7 @@ int main()
         constraint_background.setOrigin(constraint.z, constraint.z);
         constraint_background.setFillColor(sf::Color::Black);
         constraint_background.setPosition(constraint.x, constraint.y);
-        constraint_background.setPointCount(128);
+        constraint_background.setPointCount(128u);
         window.draw(constraint_background);
 
         sf::CircleShape circle;
