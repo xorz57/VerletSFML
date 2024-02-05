@@ -6,22 +6,19 @@
 #include <random>
 #include <vector>
 
-struct Object
-{
+struct Object {
     Object(const sf::Vector2f &position, float radius) : position(position),
                                                          position_last(position),
                                                          radius(radius) {}
 
-    void Update(float dt)
-    {
+    void Update(float dt) {
         const sf::Vector2f displacement = position - position_last;
         position_last = position;
         position = position + displacement + acceleration * (dt * dt);
         acceleration = {};
     }
 
-    void SetVelocity(sf::Vector2f v, float dt)
-    {
+    void SetVelocity(sf::Vector2f v, float dt) {
         position_last = position - (v * dt);
     }
 
@@ -32,8 +29,7 @@ struct Object
     sf::Color color = sf::Color::White;
 };
 
-static sf::Color GetRainbow(float t)
-{
+static sf::Color GetRainbow(float t) {
     const float c1 = glm::sin(t);
     const float c2 = glm::sin(t + 0.33f * 2.0f * glm::pi<float>());
     const float c3 = glm::sin(t + 0.66f * 2.0f * glm::pi<float>());
@@ -43,41 +39,34 @@ static sf::Color GetRainbow(float t)
     return sf::Color(r, g, b);
 }
 
-void HandleEventClosed(sf::Window &window, const sf::Event &)
-{
+void HandleEventClosed(sf::Window &window, const sf::Event &) {
     window.close();
 }
 
-void HandleEventKeyPressed(sf::Window &window, const sf::Event &event)
-{
-    if (event.key.code == sf::Keyboard::Escape)
-    {
+void HandleEventKeyPressed(sf::Window &window, const sf::Event &event) {
+    if (event.key.code == sf::Keyboard::Escape) {
         window.close();
         return;
     }
 }
 
-void ProcessEvents(sf::Window &window)
-{
+void ProcessEvents(sf::Window &window) {
     sf::Event event{};
-    while (window.pollEvent(event))
-    {
-        switch (event.type)
-        {
-        case sf::Event::Closed:
-            HandleEventClosed(window, event);
-            break;
-        case sf::Event::KeyPressed:
-            HandleEventKeyPressed(window, event);
-            break;
-        default:
-            break;
+    while (window.pollEvent(event)) {
+        switch (event.type) {
+            case sf::Event::Closed:
+                HandleEventClosed(window, event);
+                break;
+            case sf::Event::KeyPressed:
+                HandleEventKeyPressed(window, event);
+                break;
+            default:
+                break;
         }
     }
 }
 
-int main()
-{
+int main() {
     sf::Vector2f gravitationalAcceleration(0.0f, 1'000.0f);
     std::vector<Object> objects;
 
@@ -101,15 +90,13 @@ int main()
 
     sf::Clock clock;
 
-    while (window.isOpen())
-    {
+    while (window.isOpen()) {
         ProcessEvents(window);
 
         totalTime += frameDeltaTime;
         const float stepDeltaTime = frameDeltaTime / static_cast<float>(steps);
 
-        if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f)
-        {
+        if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f) {
             clock.restart();
             Object object(sf::Vector2f(450.0f, 50.0f), dis(gen));
             const float angle = 1.0f * glm::sin(totalTime) + 0.5f * glm::pi<float>();
@@ -118,19 +105,15 @@ int main()
             objects.push_back(object);
         }
 
-        for (uint32_t step = 0; step < steps; step++)
-        {
-            for (auto &object : objects)
-            {
+        for (uint32_t step = 0; step < steps; step++) {
+            for (auto &object: objects) {
                 object.acceleration += gravitationalAcceleration;
             }
             const float responseCoefficient = 0.75f;
 
-            for (size_t i = 0; i < objects.size(); ++i)
-            {
+            for (size_t i = 0; i < objects.size(); ++i) {
                 Object &object1 = objects[i];
-                for (size_t k = i + 1; k < objects.size(); ++k)
-                {
+                for (size_t k = i + 1; k < objects.size(); ++k) {
                     Object &object2 = objects[k];
 
                     const sf::Vector2f dPosition = object1.position - object2.position;
@@ -138,8 +121,7 @@ int main()
                     const sf::Vector2f dPositionNormalized = dPosition / dPositionLength;
 
                     const float minDistance = object1.radius + object2.radius;
-                    if (dPositionLength < minDistance)
-                    {
+                    if (dPositionLength < minDistance) {
                         const float massRatio1 = object1.radius / (object1.radius + object2.radius);
                         const float massRatio2 = object2.radius / (object1.radius + object2.radius);
                         const float delta = 0.5f * responseCoefficient * (dPositionLength - minDistance);
@@ -148,27 +130,23 @@ int main()
                     }
                 }
             }
-            for (auto &object : objects)
-            {
+            for (auto &object: objects) {
                 const sf::Vector2f dPosition = constraintCenter - object.position;
                 const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
                 const sf::Vector2f dPositionNormalized = dPosition / dPositionLength;
 
                 const float maxDistance = constraintRadius - object.radius;
-                if (dPositionLength > maxDistance)
-                {
+                if (dPositionLength > maxDistance) {
                     object.position = constraintCenter - maxDistance * dPositionNormalized;
                 }
             }
-            for (auto &object : objects)
-            {
+            for (auto &object: objects) {
                 object.Update(stepDeltaTime);
             }
         }
 
         window.clear(sf::Color(25, 25, 25));
 
-        // Draw Constraint
         sf::CircleShape circle1;
         circle1.setPointCount(128u);
         circle1.setRadius(constraintRadius);
@@ -177,9 +155,7 @@ int main()
         circle1.setFillColor(sf::Color::Black);
         window.draw(circle1);
 
-        // Draw Objects
-        for (const Object &object : objects)
-        {
+        for (const Object &object: objects) {
             sf::CircleShape circle2;
             circle2.setPointCount(32u);
             circle2.setRadius(object.radius);
