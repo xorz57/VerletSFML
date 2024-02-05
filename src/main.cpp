@@ -88,8 +88,10 @@ int main()
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dis(1.0, 20.0);
 
+    sf::VideoMode mode(1'000u, 1'000u);
+    sf::String title("VerletSFML");
     sf::ContextSettings settings{24u, 8u, 8u, 3u, 3u};
-    sf::RenderWindow window(sf::VideoMode(1'000u, 1'000u), "VerletSFML", sf::Style::Default, settings);
+    sf::RenderWindow window(mode, title, sf::Style::Default, settings);
     window.setFramerateLimit(60u);
 
     float frameDeltaTime = 1.0f / 60.0f;
@@ -116,7 +118,7 @@ int main()
             objects.push_back(object);
         }
 
-        for (uint32_t step = steps; step--;)
+        for (uint32_t step = 0; step < steps; step++)
         {
             for (auto &object : objects)
             {
