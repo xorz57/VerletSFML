@@ -92,7 +92,7 @@ int main()
     float frameDeltaTime = 1.0f / 60.0f;
     float totalTime = 0.0f;
 
-    uint32_t subSteps = 8u;
+    uint32_t steps = 8u;
 
     sf::Clock clock;
 
@@ -101,7 +101,7 @@ int main()
         ProcessEvents(window);
 
         totalTime += frameDeltaTime;
-        const float stepDeltaTime = frameDeltaTime / static_cast<float>(subSteps);
+        const float stepDeltaTime = frameDeltaTime / static_cast<float>(steps);
 
         if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f)
         {
@@ -112,43 +112,44 @@ int main()
             object.color = GetRainbow(totalTime);
         }
 
-        for (uint32_t i = subSteps; i--;)
+        for (uint32_t step = steps; step--;)
         {
             for (auto &object : objects)
             {
                 object.acceleration += gravitationalAcceleration;
             }
-            const float response_coef = 0.75f;
+            const float responseCoefficient = 0.75f;
 
             for (size_t i = 0; i < objects.size(); ++i)
             {
-                Object &object_1 = objects[i];
+                Object &object1 = objects[i];
                 for (size_t k = i + 1; k < objects.size(); ++k)
                 {
-                    Object &object_2 = objects[k];
-                    const sf::Vector2f v = object_1.position - object_2.position;
-                    const float dist2 = v.x * v.x + v.y * v.y;
-                    const float min_dist = object_1.radius + object_2.radius;
-                    if (dist2 < min_dist * min_dist)
+                    Object &object2 = objects[k];
+
+                    const sf::Vector2f dPosition = object1.position - object2.position;
+                    const float dPositionLength = sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
+                    const float minDistance = object1.radius + object2.radius;
+                    if (dPositionLength < minDistance)
                     {
-                        const float dist = sqrt(dist2);
-                        const sf::Vector2f n = v / dist;
-                        const float mass_ratio_1 = object_1.radius / (object_1.radius + object_2.radius);
-                        const float mass_ratio_2 = object_2.radius / (object_1.radius + object_2.radius);
-                        const float delta = 0.5f * response_coef * (dist - min_dist);
-                        object_1.position -= n * (mass_ratio_2 * delta);
-                        object_2.position += n * (mass_ratio_1 * delta);
+                        const sf::Vector2f n = dPosition / dPositionLength;
+                        const float mass_ratio_1 = object1.radius / (object1.radius + object2.radius);
+                        const float mass_ratio_2 = object2.radius / (object1.radius + object2.radius);
+                        const float delta = 0.5f * responseCoefficient * (dPositionLength - minDistance);
+                        object1.position -= n * (mass_ratio_2 * delta);
+                        object2.position += n * (mass_ratio_1 * delta);
                     }
                 }
             }
             for (auto &object : objects)
             {
-                const sf::Vector2f v = constraintCenter - object.position;
-                const float distance = glm::sqrt(v.x * v.x + v.y * v.y);
-                if (distance > (constraintRadius - object.radius))
+                const sf::Vector2f dPosition = constraintCenter - object.position;
+                const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
+                const sf::Vector2f dPositionNormalized = dPosition / dPositionLength;
+                const float maxDistance = constraintRadius - object.radius;
+                if (dPositionLength > maxDistance)
                 {
-                    const sf::Vector2f n = v / distance;
-                    object.position = constraintCenter - n * (constraintRadius - object.radius);
+                    object.position = constraintCenter - maxDistance * dPositionNormalized;
                 }
             }
             for (auto &object : objects)
