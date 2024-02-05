@@ -49,36 +49,3 @@ using RNGf = RNG<float>;
 
 template <typename T>
 RealNumberGenerator<T> RNG<T>::gen = RealNumberGenerator<T>();
-
-template <typename T>
-class IntegerNumberGenerator : public NumberGenerator
-{
-public:
-    IntegerNumberGenerator() : NumberGenerator() {}
-
-    T getUnder(T max)
-    {
-        std::uniform_int_distribution<std::mt19937::result_type> dist(0, max);
-        return dist(gen);
-    }
-
-    T getRange(T min, T max)
-    {
-        std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
-        return dist(gen);
-    }
-};
-
-template <typename T>
-class RNGi
-{
-public:
-    static T getUnder(T max) { return gen.getUnder(max); }
-    static T getRange(T min, T max) { return gen.getRange(min, max); }
-
-private:
-    static IntegerNumberGenerator<T> gen;
-};
-
-template <typename T>
-IntegerNumberGenerator<T> RNGi<T>::gen;
