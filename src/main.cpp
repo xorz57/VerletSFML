@@ -11,22 +11,11 @@ struct Object {
                                                          position_last(position),
                                                          radius(radius) {}
 
-    void Update(float dt) {
-        const sf::Vector2f displacement = position - position_last;
-        position_last = position;
-        position = position + displacement + acceleration * (dt * dt);
-        acceleration = {};
-    }
-
-    void SetVelocity(sf::Vector2f v, float dt) {
-        position_last = position - (v * dt);
-    }
-
     sf::Vector2f position{0.0f, 0.0f};
     sf::Vector2f position_last{0.0f, 0.0f};
     sf::Vector2f acceleration{0.0f, 0.0f};
-    float radius = 10.0f;
-    sf::Color color = sf::Color::White;
+    float radius{0.0f};
+    sf::Color color{sf::Color::White};
 };
 
 static sf::Color GetRainbow(float t) {
@@ -101,7 +90,8 @@ int main() {
 
             Object object(sf::Vector2f(450.0f, 50.0f), dis(gen));
             const float angle = 1.0f * glm::sin(totalTime) + 0.5f * glm::pi<float>();
-            object.SetVelocity(1'200.0f * sf::Vector2f(glm::cos(angle), glm::sin(angle)), stepDeltaTime);
+            const sf::Vector2f velocity = 1'200.0f * sf::Vector2f(glm::cos(angle), glm::sin(angle));
+            object.position_last = object.position - (velocity * stepDeltaTime);
             object.color = GetRainbow(totalTime);
 
             objects.push_back(object);
@@ -146,7 +136,10 @@ int main() {
             }
 
             for (auto &object: objects) {
-                object.Update(stepDeltaTime);
+                const sf::Vector2f displacement = object.position - object.position_last;
+                object.position_last = object.position;
+                object.position = object.position + displacement + object.acceleration * (stepDeltaTime * stepDeltaTime);
+                object.acceleration = {};
             }
         }
 
