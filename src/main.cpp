@@ -84,7 +84,6 @@ int main()
 
     sf::Vector2f constraintCenter(500.0f, 500.0f);
     float constraintRadius = 450.0f;
-    const sf::Vector3f constraint(constraintCenter.x, constraintCenter.y, constraintRadius);
 
     sf::ContextSettings settings{24u, 8u, 8u, 3u, 3u};
     sf::RenderWindow window(sf::VideoMode(1'000u, 1'000u), "VerletSFML", sf::Style::Default, settings);
@@ -102,14 +101,14 @@ int main()
         ProcessEvents(window);
 
         totalTime += frameDeltaTime;
-        const float step_dt = frameDeltaTime / static_cast<float>(subSteps);
+        const float stepDeltaTime = frameDeltaTime / static_cast<float>(subSteps);
 
         if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f)
         {
             clock.restart();
             auto &object = objects.emplace_back(sf::Vector2f(500.0f, 200.0f), RNGf::getRange(1.0f, 20.0f));
             const float angle = 1.0f * glm::sin(totalTime) + 0.5f * glm::pi<float>();
-            object.SetVelocity(1'200.0f * sf::Vector2f(glm::cos(angle), glm::sin(angle)), step_dt);
+            object.SetVelocity(1'200.0f * sf::Vector2f(glm::cos(angle), glm::sin(angle)), stepDeltaTime);
             object.color = GetRainbow(totalTime);
         }
 
@@ -154,7 +153,7 @@ int main()
             }
             for (auto &object : objects)
             {
-                object.Update(step_dt);
+                object.Update(stepDeltaTime);
             }
         }
 
@@ -163,9 +162,9 @@ int main()
         // Draw Constraint
         sf::CircleShape circle1;
         circle1.setPointCount(128u);
-        circle1.setRadius(constraint.z);
-        circle1.setOrigin(constraint.z, constraint.z);
-        circle1.setPosition(constraint.x, constraint.y);
+        circle1.setRadius(constraintRadius);
+        circle1.setOrigin(constraintRadius, constraintRadius);
+        circle1.setPosition(constraintCenter);
         circle1.setFillColor(sf::Color::Black);
         window.draw(circle1);
 
