@@ -111,7 +111,7 @@ int main()
         if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f)
         {
             clock.restart();
-            Object object(sf::Vector2f(500.0f, 200.0f), dis(gen));
+            Object object(sf::Vector2f(450.0f, 50.0f), dis(gen));
             const float angle = 1.0f * glm::sin(totalTime) + 0.5f * glm::pi<float>();
             object.SetVelocity(1'200.0f * sf::Vector2f(glm::cos(angle), glm::sin(angle)), stepDeltaTime);
             object.color = GetRainbow(totalTime);
