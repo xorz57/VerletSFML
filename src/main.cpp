@@ -98,10 +98,12 @@ int main() {
 
         if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f) {
             clock.restart();
+
             Object object(sf::Vector2f(450.0f, 50.0f), dis(gen));
             const float angle = 1.0f * glm::sin(totalTime) + 0.5f * glm::pi<float>();
             object.SetVelocity(1'200.0f * sf::Vector2f(glm::cos(angle), glm::sin(angle)), stepDeltaTime);
             object.color = GetRainbow(totalTime);
+
             objects.push_back(object);
         }
 
@@ -109,10 +111,10 @@ int main() {
             for (auto &object: objects) {
                 object.acceleration += gravitationalAcceleration;
             }
-            const float responseCoefficient = 0.75f;
 
             for (size_t i = 0; i < objects.size(); ++i) {
                 Object &object1 = objects[i];
+
                 for (size_t k = i + 1; k < objects.size(); ++k) {
                     Object &object2 = objects[k];
 
@@ -124,12 +126,14 @@ int main() {
                     if (dPositionLength < minDistance) {
                         const float massRatio1 = object1.radius / (object1.radius + object2.radius);
                         const float massRatio2 = object2.radius / (object1.radius + object2.radius);
+                        const float responseCoefficient = 0.75f;
                         const float delta = 0.5f * responseCoefficient * (dPositionLength - minDistance);
                         object1.position -= dPositionNormalized * (massRatio2 * delta);
                         object2.position += dPositionNormalized * (massRatio1 * delta);
                     }
                 }
             }
+
             for (auto &object: objects) {
                 const sf::Vector2f dPosition = constraintCenter - object.position;
                 const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
@@ -140,6 +144,7 @@ int main() {
                     object.position = constraintCenter - maxDistance * dPositionNormalized;
                 }
             }
+
             for (auto &object: objects) {
                 object.Update(stepDeltaTime);
             }
