@@ -128,16 +128,17 @@ int main()
                     Object &object2 = objects[k];
 
                     const sf::Vector2f dPosition = object1.position - object2.position;
-                    const float dPositionLength = sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
+                    const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
+                    const sf::Vector2f dPositionNormalized = dPosition / dPositionLength;
+
                     const float minDistance = object1.radius + object2.radius;
                     if (dPositionLength < minDistance)
                     {
-                        const sf::Vector2f n = dPosition / dPositionLength;
-                        const float mass_ratio_1 = object1.radius / (object1.radius + object2.radius);
-                        const float mass_ratio_2 = object2.radius / (object1.radius + object2.radius);
+                        const float massRatio1 = object1.radius / (object1.radius + object2.radius);
+                        const float massRatio2 = object2.radius / (object1.radius + object2.radius);
                         const float delta = 0.5f * responseCoefficient * (dPositionLength - minDistance);
-                        object1.position -= n * (mass_ratio_2 * delta);
-                        object2.position += n * (mass_ratio_1 * delta);
+                        object1.position -= dPositionNormalized * (massRatio2 * delta);
+                        object2.position += dPositionNormalized * (massRatio1 * delta);
                     }
                 }
             }
@@ -146,6 +147,7 @@ int main()
                 const sf::Vector2f dPosition = constraintCenter - object.position;
                 const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
                 const sf::Vector2f dPositionNormalized = dPosition / dPositionLength;
+
                 const float maxDistance = constraintRadius - object.radius;
                 if (dPositionLength > maxDistance)
                 {
