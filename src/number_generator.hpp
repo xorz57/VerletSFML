@@ -2,44 +2,23 @@
 
 #include <random>
 
-class NumberGenerator
-{
-public:
-    NumberGenerator() : gen(rd()) {}
-
-    std::random_device rd;
-    std::mt19937 gen;
-};
-
 template <typename T>
-class RealNumberGenerator : public NumberGenerator
+class RealNumberGenerator
 {
 private:
     std::uniform_real_distribution<T> dis{0.0f, 1.0f};
+    std::random_device rd;
+    std::mt19937 gen{rd()};
 
 public:
-    RealNumberGenerator() : NumberGenerator() {}
-
-    float get() { return dis(gen); }
-
-    float getUnder(T max) { return get() * max; }
-
-    float getRange(T min, T max) { return min + get() * (max - min); }
-
-    float getRange(T width) { return getRange(-width * 0.5f, width * 0.5f); }
+    float getRange(T min, T max) { return min + dis(gen) * (max - min); }
 };
 
 template <typename T>
 class RNG
 {
 public:
-    static T get() { return gen.get(); }
-
-    static float getUnder(T max) { return gen.getUnder(max); }
-
     static float getRange(T min, T max) { return gen.getRange(min, max); }
-
-    static float getRange(T width) { return gen.getRange(width); }
 
 private:
     static RealNumberGenerator<T> gen;
