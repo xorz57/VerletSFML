@@ -1,10 +1,9 @@
-#include "number_generator.hpp"
-
 #include <SFML/Graphics.hpp>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+#include <random>
 #include <vector>
 
 struct Object
@@ -85,6 +84,10 @@ int main()
     sf::Vector2f constraintCenter(500.0f, 500.0f);
     float constraintRadius = 450.0f;
 
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(1.0, 20.0);
+
     sf::ContextSettings settings{24u, 8u, 8u, 3u, 3u};
     sf::RenderWindow window(sf::VideoMode(1'000u, 1'000u), "VerletSFML", sf::Style::Default, settings);
     window.setFramerateLimit(60u);
@@ -106,7 +109,7 @@ int main()
         if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f)
         {
             clock.restart();
-            Object object(sf::Vector2f(500.0f, 200.0f), RNGf::getRange(1.0f, 20.0f));
+            Object object(sf::Vector2f(500.0f, 200.0f), dis(gen));
             const float angle = 1.0f * glm::sin(totalTime) + 0.5f * glm::pi<float>();
             object.SetVelocity(1'200.0f * sf::Vector2f(glm::cos(angle), glm::sin(angle)), stepDeltaTime);
             object.color = GetRainbow(totalTime);
