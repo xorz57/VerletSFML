@@ -34,13 +34,13 @@ struct Object
 
 static sf::Color GetRainbow(float t)
 {
-    const float r = glm::sin(t);
-    const float g = glm::sin(t + 0.33f * 2.0f * glm::pi<float>());
-    const float b = glm::sin(t + 0.66f * 2.0f * glm::pi<float>());
-    return {
-        static_cast<uint8_t>(255.0f * r * r),
-        static_cast<uint8_t>(255.0f * g * g),
-        static_cast<uint8_t>(255.0f * b * b)};
+    const float c1 = glm::sin(t);
+    const float c2 = glm::sin(t + 0.33f * 2.0f * glm::pi<float>());
+    const float c3 = glm::sin(t + 0.66f * 2.0f * glm::pi<float>());
+    const auto r = static_cast<sf::Uint8>(255.0f * c1 * c1);
+    const auto g = static_cast<sf::Uint8>(255.0f * c2 * c2);
+    const auto b = static_cast<sf::Uint8>(255.0f * c3 * c3);
+    return sf::Color(r, g, b);
 }
 
 void HandleEventClosed(sf::Window &window, const sf::Event &)
