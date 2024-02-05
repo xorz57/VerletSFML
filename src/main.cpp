@@ -82,17 +82,18 @@ int main()
     sf::Vector2f gravitationalAcceleration(0.0f, 1'000.0f);
     std::vector<Object> objects;
 
-    sf::Vector2f constraintCenter(0.5f * 1'000.0f, 0.5f * 1'000.0f);
+    sf::Vector2f constraintCenter(500.0f, 500.0f);
     float constraintRadius = 450.0f;
+    const sf::Vector3f constraint(constraintCenter.x, constraintCenter.y, constraintRadius);
 
     sf::ContextSettings settings{24u, 8u, 8u, 3u, 3u};
     sf::RenderWindow window(sf::VideoMode(1'000u, 1'000u), "VerletSFML", sf::Style::Default, settings);
     window.setFramerateLimit(60u);
 
     float frameDeltaTime = 1.0f / 60.0f;
-    float time = 0.0f;
+    float totalTime = 0.0f;
 
-    uint32_t subSteps = 8;
+    uint32_t subSteps = 8u;
 
     sf::Clock clock;
 
@@ -100,18 +101,18 @@ int main()
     {
         ProcessEvents(window);
 
+        totalTime += frameDeltaTime;
+        const float step_dt = frameDeltaTime / static_cast<float>(subSteps);
+
         if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f)
         {
             clock.restart();
             auto &object = objects.emplace_back(sf::Vector2f(500.0f, 200.0f), RNGf::getRange(1.0f, 20.0f));
-            const float t = time;
-            const float angle = 1.0f * glm::sin(t) + 0.5f * glm::pi<float>();
-            object.SetVelocity(1'200.0f * sf::Vector2f{glm::cos(angle), glm::sin(angle)}, frameDeltaTime / static_cast<float>(subSteps));
-            object.color = GetRainbow(t);
+            const float angle = 1.0f * glm::sin(totalTime) + 0.5f * glm::pi<float>();
+            object.SetVelocity(1'200.0f * sf::Vector2f(glm::cos(angle), glm::sin(angle)), step_dt);
+            object.color = GetRainbow(totalTime);
         }
 
-        time += frameDeltaTime;
-        const float step_dt = frameDeltaTime / static_cast<float>(subSteps);
         for (uint32_t i = subSteps; i--;)
         {
             for (auto &object : objects)
@@ -159,24 +160,25 @@ int main()
 
         window.clear(sf::Color::White);
 
-        const sf::Vector3f constraint{constraintCenter.x, constraintCenter.y, constraintRadius};
-        sf::CircleShape constraint_background{constraint.z};
-        constraint_background.setOrigin(constraint.z, constraint.z);
-        constraint_background.setFillColor(sf::Color::Black);
-        constraint_background.setPosition(constraint.x, constraint.y);
-        constraint_background.setPointCount(128u);
-        window.draw(constraint_background);
+        // Draw Constraint
+        sf::CircleShape circle1;
+        circle1.setPointCount(128u);
+        circle1.setRadius(constraint.z);
+        circle1.setOrigin(constraint.z, constraint.z);
+        circle1.setPosition(constraint.x, constraint.y);
+        circle1.setFillColor(sf::Color::Black);
+        window.draw(circle1);
 
-        sf::CircleShape circle;
-        circle.setRadius(1.0f);
-        circle.setPointCount(32u);
-        circle.setOrigin(1.0f, 1.0f);
-        for (const auto &object : objects)
+        // Draw Objects
+        for (const Object &object : objects)
         {
-            circle.setPosition(object.position);
-            circle.setScale(object.radius, object.radius);
-            circle.setFillColor(object.color);
-            window.draw(circle);
+            sf::CircleShape circle2;
+            circle2.setPointCount(32u);
+            circle2.setRadius(object.radius);
+            circle2.setOrigin(object.radius, object.radius);
+            circle2.setPosition(object.position);
+            circle2.setFillColor(object.color);
+            window.draw(circle2);
         }
 
         window.display();
