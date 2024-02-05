@@ -25,7 +25,7 @@ static sf::Color GetRainbow(float t) {
     const auto r = static_cast<sf::Uint8>(255.0f * c1 * c1);
     const auto g = static_cast<sf::Uint8>(255.0f * c2 * c2);
     const auto b = static_cast<sf::Uint8>(255.0f * c3 * c3);
-    return sf::Color(r, g, b);
+    return {r, g, b};
 }
 
 void HandleEventClosed(sf::Window &window, const sf::Event &) {
@@ -72,7 +72,7 @@ int main() {
     sf::RenderWindow window(mode, title, sf::Style::Default, settings);
     window.setFramerateLimit(60u);
 
-    float frameDeltaTime = 1.0f / 60.0f;
+    float deltaTime = 1.0f / 60.0f;
     float totalTime = 0.0f;
 
     uint32_t steps = 8u;
@@ -82,8 +82,8 @@ int main() {
     while (window.isOpen()) {
         ProcessEvents(window);
 
-        totalTime += frameDeltaTime;
-        const float stepDeltaTime = frameDeltaTime / static_cast<float>(steps);
+        totalTime += deltaTime;
+        const float stepDeltaTime = deltaTime / static_cast<float>(steps);
 
         if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f) {
             clock.restart();
