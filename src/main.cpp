@@ -7,11 +7,11 @@
 #include <cmath>
 #include <vector>
 
-struct VerletObject
+struct Object
 {
-    VerletObject(const sf::Vector2f &position, float radius) : position(position),
-                                                               position_last(position),
-                                                               radius(radius) {}
+    Object(const sf::Vector2f &position, float radius) : position(position),
+                                                         position_last(position),
+                                                         radius(radius) {}
 
     void Update(float dt)
     {
@@ -79,22 +79,22 @@ void ProcessEvents(sf::Window &window)
 
 int main()
 {
-    sf::Vector2f mGravitationalAcceleration{0.0f, 1000.0f};
-    std::vector<VerletObject> mVerletObjects;
-    float mTime = 0.0f;
+    sf::Vector2f gravitationalAcceleration{0.0f, 1000.0f};
+    std::vector<Object> objects;
+    float time = 0.0f;
 
-    sf::Vector2f mConstraintCenter = {0.5f * 1000.0f, 0.5f * 1000.0f};
-    float mConstraintRadius = 450.0f;
-    uint32_t mSubSteps = 8;
-    float mFrameDt = 1.0f / static_cast<float>(60u);
+    sf::Vector2f constraintCenter = {0.5f * 1000.0f, 0.5f * 1000.0f};
+    float constraintRadius = 450.0f;
+    uint32_t subSteps = 8;
+    float frameDeltaTime = 1.0f / 60.0f;
 
-    const float object_spawn_delay = 0.025f;
-    const float object_spawn_speed = 1200.0f;
-    const sf::Vector2f object_spawn_position = {500.0f, 200.0f};
-    const float object_min_radius = 1.0f;
-    const float object_max_radius = 20.0f;
-    const uint32_t max_objects_count = 1000;
-    const float max_angle = 1.0f;
+    const float objectSpawnDelay = 0.025f;
+    const float objectSpawnSpeed = 1200.0f;
+    const sf::Vector2f objectSpawnPosition = {500.0f, 200.0f};
+    const float objectMinRadius = 1.0f;
+    const float objectMaxRadius = 20.0f;
+    const uint32_t maxObjectsCount = 1000;
+    const float objectSpawnMaxAngle = 1.0f;
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 1;
@@ -108,32 +108,32 @@ int main()
     {
         ProcessEvents(window);
 
-        if (mVerletObjects.size() < max_objects_count && clock.getElapsedTime().asSeconds() >= object_spawn_delay)
+        if (objects.size() < maxObjectsCount && clock.getElapsedTime().asSeconds() >= objectSpawnDelay)
         {
             clock.restart();
-            auto &object = mVerletObjects.emplace_back(object_spawn_position, RNGf::getRange(object_min_radius, object_max_radius));
-            const float t = mTime;
-            const float angle = max_angle * sin(t) + glm::pi<float>() * 0.5f;
-            object.SetVelocity(object_spawn_speed * sf::Vector2f{cos(angle), sin(angle)}, mFrameDt / static_cast<float>(mSubSteps));
+            auto &object = objects.emplace_back(objectSpawnPosition, RNGf::getRange(objectMinRadius, objectMaxRadius));
+            const float t = time;
+            const float angle = objectSpawnMaxAngle * sin(t) + glm::pi<float>() * 0.5f;
+            object.SetVelocity(objectSpawnSpeed * sf::Vector2f{cos(angle), sin(angle)}, frameDeltaTime / static_cast<float>(subSteps));
             object.color = GetRainbow(t);
         }
 
-        mTime += mFrameDt;
-        const float step_dt = mFrameDt / static_cast<float>(mSubSteps);
-        for (uint32_t i{mSubSteps}; i--;)
+        time += frameDeltaTime;
+        const float step_dt = frameDeltaTime / static_cast<float>(subSteps);
+        for (uint32_t i{subSteps}; i--;)
         {
-            for (auto &verletObject : mVerletObjects)
+            for (auto &object : objects)
             {
-                verletObject.acceleration += mGravitationalAcceleration;
+                object.acceleration += gravitationalAcceleration;
             }
             const float response_coef = 0.75f;
 
-            for (size_t i = 0; i < mVerletObjects.size(); ++i)
+            for (size_t i = 0; i < objects.size(); ++i)
             {
-                VerletObject &object_1 = mVerletObjects[i];
-                for (size_t k = i + 1; k < mVerletObjects.size(); ++k)
+                Object &object_1 = objects[i];
+                for (size_t k = i + 1; k < objects.size(); ++k)
                 {
-                    VerletObject &object_2 = mVerletObjects[k];
+                    Object &object_2 = objects[k];
                     const sf::Vector2f v = object_1.position - object_2.position;
                     const float dist2 = v.x * v.x + v.y * v.y;
                     const float min_dist = object_1.radius + object_2.radius;
@@ -149,25 +149,25 @@ int main()
                     }
                 }
             }
-            for (auto &verletObject : mVerletObjects)
+            for (auto &object : objects)
             {
-                const sf::Vector2f v = mConstraintCenter - verletObject.position;
+                const sf::Vector2f v = constraintCenter - object.position;
                 const float dist = sqrt(v.x * v.x + v.y * v.y);
-                if (dist > (mConstraintRadius - verletObject.radius))
+                if (dist > (constraintRadius - object.radius))
                 {
                     const sf::Vector2f n = v / dist;
-                    verletObject.position = mConstraintCenter - n * (mConstraintRadius - verletObject.radius);
+                    object.position = constraintCenter - n * (constraintRadius - object.radius);
                 }
             }
-            for (auto &verletObject : mVerletObjects)
+            for (auto &object : objects)
             {
-                verletObject.Update(step_dt);
+                object.Update(step_dt);
             }
         }
 
         window.clear(sf::Color::White);
 
-        const sf::Vector3f constraint{mConstraintCenter.x, mConstraintCenter.y, mConstraintRadius};
+        const sf::Vector3f constraint{constraintCenter.x, constraintCenter.y, constraintRadius};
         sf::CircleShape constraint_background{constraint.z};
         constraint_background.setOrigin(constraint.z, constraint.z);
         constraint_background.setFillColor(sf::Color::Black);
@@ -175,14 +175,15 @@ int main()
         constraint_background.setPointCount(128);
         window.draw(constraint_background);
 
-        sf::CircleShape circle{1.0f};
-        circle.setPointCount(32);
+        sf::CircleShape circle;
+        circle.setRadius(1.0f);
+        circle.setPointCount(32u);
         circle.setOrigin(1.0f, 1.0f);
-        for (const auto &verletObject : mVerletObjects)
+        for (const auto &object : objects)
         {
-            circle.setPosition(verletObject.position);
-            circle.setScale(verletObject.radius, verletObject.radius);
-            circle.setFillColor(verletObject.color);
+            circle.setPosition(object.position);
+            circle.setScale(object.radius, object.radius);
+            circle.setFillColor(object.color);
             window.draw(circle);
         }
 
