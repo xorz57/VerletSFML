@@ -81,14 +81,14 @@ int main()
     sf::Vector2f gravitationalAcceleration(0.0f, 1'000.0f);
     std::vector<Object> objects;
 
-    sf::Vector2f constraintCenter(500.0f, 500.0f);
+    sf::Vector2f constraintCenter(450.0f, 450.0f);
     float constraintRadius = 450.0f;
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dis(1.0, 20.0);
 
-    sf::VideoMode mode(1'000u, 1'000u);
+    sf::VideoMode mode(900u, 900u);
     sf::String title("VerletSFML");
     sf::ContextSettings settings{24u, 8u, 8u, 3u, 3u};
     sf::RenderWindow window(mode, title, sf::Style::Default, settings);
