@@ -12,8 +12,9 @@ endif()
 
 find_package(glm REQUIRED)
 find_package(SFML 2.5.0 COMPONENTS system window graphics REQUIRED)
+find_package(ImGui-SFML REQUIRED)
 
-set(SOURCES src/Main.cpp)
+set(SOURCES src/Main.cpp src/Application.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
@@ -21,3 +22,4 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 target_link_libraries(${PROJECT_NAME} PRIVATE sfml-system sfml-window sfml-graphics)
+target_link_libraries(${PROJECT_NAME} PRIVATE ImGui-SFML::ImGui-SFML)
