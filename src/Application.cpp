@@ -74,14 +74,14 @@ void Application::Run() {
         ImGui::SFML::Update(mWindow, deltaTime);
 
         ImGui::Begin("Settings");
-        ImGui::DragFloat2("Gravity", glm::value_ptr(mGravitationalAcceleration), 0.1f, 0.0f, 1'000.0f);
+        ImGui::DragFloat2("Gravity", glm::value_ptr(mGravitationalAcceleration), 10.0f, -1'000.0f, 1'000.0f);
         ImGui::End();
 
         ImGui::Begin("Statistics");
-        ImGui::Text("FPS               : %3.f", 1.0f / deltaTime.asSeconds());
-        ImGui::Text("Tick Rate         : %3.f", 1.0f / fixedDeltaTime.asSeconds());
-        ImGui::Text("Fixed Delta Time  : %3d ms", fixedDeltaTime.asMilliseconds());
-        ImGui::Text("Delta Time        : %3d ms", deltaTime.asMilliseconds());
+        ImGui::Text("Frame Rate       : %3.f Hz", 1.0f / deltaTime.asSeconds());
+        ImGui::Text("Tick Rate        : %3.f Hz", 1.0f / fixedDeltaTime.asSeconds());
+        ImGui::Text("Fixed Delta Time : %3d ms", fixedDeltaTime.asMilliseconds());
+        ImGui::Text("Delta Time       : %3d ms", deltaTime.asMilliseconds());
         ImGui::End();
 
         mWindow.clear(sf::Color::Black);
