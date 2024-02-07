@@ -101,22 +101,14 @@ int main() {
         }
 
         for (uint32_t step = 0; step < steps; step++) {
-            for (Object &object: objects) {
-                object.acceleration += gravitationalAcceleration;
-            }
-
             for (size_t i = 0; i < objects.size(); ++i) {
                 Object &object1 = objects[i];
-
                 for (size_t j = i + 1; j < objects.size(); ++j) {
                     Object &object2 = objects[j];
-
                     const sf::Vector2f dPosition = object1.position - object2.position;
                     const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
                     const sf::Vector2f dPositionNormalized = dPosition / dPositionLength;
-
-                    const float minDistance = object1.radius + object2.radius;
-                    if (dPositionLength < minDistance) {
+                    if (const float minDistance = object1.radius + object2.radius; dPositionLength < minDistance) {
                         const float responseCoefficient = 0.75f;
                         const float delta = 0.5f * responseCoefficient * (dPositionLength - minDistance);
                         const float massRatio1 = object1.radius / (object1.radius + object2.radius);
@@ -126,19 +118,14 @@ int main() {
                     }
                 }
             }
-
             for (Object &object: objects) {
+                object.acceleration += gravitationalAcceleration;
                 const sf::Vector2f dPosition = constraintCenter - object.position;
                 const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
                 const sf::Vector2f dPositionNormalized = dPosition / dPositionLength;
-
-                const float maxDistance = constraintRadius - object.radius;
-                if (dPositionLength > maxDistance) {
+                if (const float maxDistance = constraintRadius - object.radius; dPositionLength > maxDistance) {
                     object.position = constraintCenter - maxDistance * dPositionNormalized;
                 }
-            }
-
-            for (Object &object: objects) {
                 const sf::Vector2f displacement = object.position - object.position_last;
                 object.position_last = object.position;
                 object.position = object.position + displacement + object.acceleration * stepDeltaTime * stepDeltaTime;
