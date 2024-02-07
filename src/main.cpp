@@ -19,12 +19,15 @@ struct Object {
 };
 
 static sf::Color GetRainbow(float t) {
-    const float c1 = glm::sin(t);
-    const float c2 = glm::sin(t + 0.33f * 2.0f * glm::pi<float>());
-    const float c3 = glm::sin(t + 0.66f * 2.0f * glm::pi<float>());
-    const auto r = static_cast<sf::Uint8>(255.0f * c1 * c1);
-    const auto g = static_cast<sf::Uint8>(255.0f * c2 * c2);
-    const auto b = static_cast<sf::Uint8>(255.0f * c3 * c3);
+    constexpr float c1 = 0.0f;
+    constexpr float c2 = 2.0f * glm::pi<float>() / 3.0f;
+    constexpr float c3 = 4.0f * glm::pi<float>() / 3.0f;
+    const float f1 = glm::sin(t + c1);
+    const float f2 = glm::sin(t + c2);
+    const float f3 = glm::sin(t + c3);
+    const auto r = static_cast<sf::Uint8>(255.0f * f1 * f1);
+    const auto g = static_cast<sf::Uint8>(255.0f * f2 * f2);
+    const auto b = static_cast<sf::Uint8>(255.0f * f3 * f3);
     return {r, g, b};
 }
 
