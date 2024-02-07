@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 
+#include <glm/geometric.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
@@ -7,13 +8,13 @@
 #include <vector>
 
 struct Object {
-    Object(const sf::Vector2f &position, float radius) : position(position),
-                                                         position_last(position),
-                                                         radius(radius) {}
+    Object(const glm::vec2 &position, float radius) : position(position),
+                                                      position_last(position),
+                                                      radius(radius) {}
 
-    sf::Vector2f position{0.0f, 0.0f};
-    sf::Vector2f position_last{0.0f, 0.0f};
-    sf::Vector2f acceleration{0.0f, 0.0f};
+    glm::vec2 position{0.0f, 0.0f};
+    glm::vec2 position_last{0.0f, 0.0f};
+    glm::vec2 acceleration{0.0f, 0.0f};
     float radius{0.0f};
     sf::Color color{sf::Color::White};
 };
@@ -59,10 +60,10 @@ void ProcessEvents(sf::Window &window) {
 }
 
 int main() {
-    sf::Vector2f gravitationalAcceleration(0.0f, 1'000.0f);
+    glm::vec2 gravitationalAcceleration(0.0f, 1'000.0f);
     std::vector<Object> objects;
 
-    sf::Vector2f constraintCenter(450.0f, 450.0f);
+    glm::vec2 constraintCenter(450.0f, 450.0f);
     float constraintRadius = 450.0f;
 
     std::random_device rd;
@@ -91,9 +92,9 @@ int main() {
         if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f) {
             clock.restart();
 
-            Object object(sf::Vector2f(450.0f, 50.0f), dis(gen));
+            Object object(glm::vec2(450.0f, 50.0f), dis(gen));
             const float angle = 1.0f * glm::sin(totalTime) + 0.5f * glm::pi<float>();
-            const sf::Vector2f velocity = 1'200.0f * sf::Vector2f(glm::cos(angle), glm::sin(angle));
+            const glm::vec2 velocity = 1'200.0f * glm::vec2(glm::cos(angle), glm::sin(angle));
             object.position_last = object.position - (velocity * stepDeltaTime);
             object.color = GetRainbow(totalTime);
 
@@ -105,28 +106,24 @@ int main() {
                 Object &object1 = objects[i];
                 for (size_t j = i + 1; j < objects.size(); ++j) {
                     Object &object2 = objects[j];
-                    const sf::Vector2f dPosition = object1.position - object2.position;
-                    const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
-                    const sf::Vector2f dPositionNormalized = dPosition / dPositionLength;
-                    if (const float minDistance = object1.radius + object2.radius; dPositionLength < minDistance) {
+                    const glm::vec2 dPosition = object1.position - object2.position;
+                    if (const float minDistance = object1.radius + object2.radius; glm::length(dPosition) < minDistance) {
                         const float responseCoefficient = 0.75f;
-                        const float delta = 0.5f * responseCoefficient * (dPositionLength - minDistance);
+                        const float delta = 0.5f * responseCoefficient * (glm::length(dPosition) - minDistance);
                         const float massRatio1 = object1.radius / (object1.radius + object2.radius);
                         const float massRatio2 = object2.radius / (object1.radius + object2.radius);
-                        object1.position -= dPositionNormalized * (massRatio2 * delta);
-                        object2.position += dPositionNormalized * (massRatio1 * delta);
+                        object1.position -= glm::normalize(dPosition) * (massRatio2 * delta);
+                        object2.position += glm::normalize(dPosition) * (massRatio1 * delta);
                     }
                 }
             }
             for (Object &object: objects) {
                 object.acceleration += gravitationalAcceleration;
-                const sf::Vector2f dPosition = constraintCenter - object.position;
-                const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
-                const sf::Vector2f dPositionNormalized = dPosition / dPositionLength;
-                if (const float maxDistance = constraintRadius - object.radius; dPositionLength > maxDistance) {
-                    object.position = constraintCenter - maxDistance * dPositionNormalized;
+                const glm::vec2 dPosition = constraintCenter - object.position;
+                if (const float maxDistance = constraintRadius - object.radius; glm::length(dPosition) > maxDistance) {
+                    object.position = constraintCenter - maxDistance * glm::normalize(dPosition);
                 }
-                const sf::Vector2f displacement = object.position - object.position_last;
+                const glm::vec2 displacement = object.position - object.position_last;
                 object.position_last = object.position;
                 object.position = object.position + displacement + object.acceleration * stepDeltaTime * stepDeltaTime;
                 object.acceleration = {};
@@ -139,7 +136,7 @@ int main() {
         circle1.setPointCount(128u);
         circle1.setRadius(constraintRadius);
         circle1.setOrigin(constraintRadius, constraintRadius);
-        circle1.setPosition(constraintCenter);
+        circle1.setPosition(constraintCenter.x, constraintCenter.y);
         circle1.setFillColor(sf::Color(25, 25, 25));
         window.draw(circle1);
 
@@ -148,7 +145,7 @@ int main() {
             circle2.setPointCount(32u);
             circle2.setRadius(object.radius);
             circle2.setOrigin(object.radius, object.radius);
-            circle2.setPosition(object.position);
+            circle2.setPosition(object.position.x, object.position.y);
             circle2.setFillColor(object.color);
             window.draw(circle2);
         }
