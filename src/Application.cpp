@@ -126,7 +126,7 @@ void Application::ProcessEvents() {
     }
 }
 
-void Application::HandleEventClosed(const sf::Event &event) {
+void Application::HandleEventClosed(const sf::Event &) {
     mWindow.close();
 }
 
