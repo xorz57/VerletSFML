@@ -13,7 +13,7 @@ endif()
 find_package(glm REQUIRED)
 find_package(SFML 2.5.0 COMPONENTS system window graphics REQUIRED)
 
-set(SOURCES src/main.cpp)
+set(SOURCES src/Main.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
