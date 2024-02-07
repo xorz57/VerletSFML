@@ -107,10 +107,8 @@ int main() {
                 for (size_t j = i + 1; j < objects.size(); ++j) {
                     Object &object2 = objects[j];
                     const glm::vec2 dPosition = object1.position - object2.position;
-                    const float dRadius = object1.radius + object2.radius;
-                    if (glm::length(dPosition) < dRadius) {
-                        const float responseCoefficient = 0.75f;
-                        const float delta = 0.5f * responseCoefficient * (glm::length(dPosition) - dRadius);
+                    if (const float dRadius = object1.radius + object2.radius; glm::length(dPosition) < dRadius) {
+                        const float delta = 0.5f * (glm::length(dPosition) - dRadius);
                         const float massRatio1 = object1.radius / (object1.radius + object2.radius);
                         const float massRatio2 = object2.radius / (object1.radius + object2.radius);
                         object1.position -= glm::normalize(dPosition) * (massRatio2 * delta);
@@ -121,8 +119,7 @@ int main() {
             for (Object &object: objects) {
                 object.acceleration += gravitationalAcceleration;
                 const glm::vec2 dPosition = constraintPosition - object.position;
-                const float dRadius = constraintRadius - object.radius;
-                if (glm::length(dPosition) > dRadius) {
+                if (const float dRadius = constraintRadius - object.radius; glm::length(dPosition) > dRadius) {
                     object.position = constraintPosition - dRadius * glm::normalize(dPosition);
                 }
                 const glm::vec2 displacement = object.position - object.position_last;
@@ -134,17 +131,8 @@ int main() {
 
         window.clear(sf::Color::Black);
 
-        sf::CircleShape circle1;
-        circle1.setPointCount(128u);
-        circle1.setRadius(constraintRadius);
-        circle1.setOrigin(constraintRadius, constraintRadius);
-        circle1.setPosition(constraintPosition.x, constraintPosition.y);
-        circle1.setFillColor(sf::Color(25, 25, 25));
-        window.draw(circle1);
-
         for (const Object &object: objects) {
             sf::CircleShape circle2;
-            circle2.setPointCount(32u);
             circle2.setRadius(object.radius);
             circle2.setOrigin(object.radius, object.radius);
             circle2.setPosition(object.position.x, object.position.y);
