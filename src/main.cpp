@@ -101,7 +101,7 @@ int main() {
         }
 
         for (uint32_t step = 0; step < steps; step++) {
-            for (auto &object: objects) {
+            for (Object &object: objects) {
                 object.acceleration += gravitationalAcceleration;
             }
 
@@ -127,7 +127,7 @@ int main() {
                 }
             }
 
-            for (auto &object: objects) {
+            for (Object &object: objects) {
                 const sf::Vector2f dPosition = constraintCenter - object.position;
                 const float dPositionLength = glm::sqrt(dPosition.x * dPosition.x + dPosition.y * dPosition.y);
                 const sf::Vector2f dPositionNormalized = dPosition / dPositionLength;
@@ -138,22 +138,22 @@ int main() {
                 }
             }
 
-            for (auto &object: objects) {
+            for (Object &object: objects) {
                 const sf::Vector2f displacement = object.position - object.position_last;
                 object.position_last = object.position;
-                object.position = object.position + displacement + object.acceleration * (stepDeltaTime * stepDeltaTime);
+                object.position = object.position + displacement + object.acceleration * stepDeltaTime * stepDeltaTime;
                 object.acceleration = {};
             }
         }
 
-        window.clear(sf::Color(25, 25, 25));
+        window.clear(sf::Color::Black);
 
         sf::CircleShape circle1;
         circle1.setPointCount(128u);
         circle1.setRadius(constraintRadius);
         circle1.setOrigin(constraintRadius, constraintRadius);
         circle1.setPosition(constraintCenter);
-        circle1.setFillColor(sf::Color::Black);
+        circle1.setFillColor(sf::Color(25, 25, 25));
         window.draw(circle1);
 
         for (const Object &object: objects) {
