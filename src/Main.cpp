@@ -66,32 +66,20 @@ int main() {
     sf::RenderWindow window(mode, title, sf::Style::Default, settings);
     window.setFramerateLimit(60u);
 
-    float deltaTime = 1.0f / 60.0f;
-    float totalTime = 0.0f;
+    const sf::Time fixedDeltaTime = sf::seconds(1.0f / 480.0f);
+    sf::Time accumulator = sf::Time::Zero;
+    sf::Time total = sf::Time::Zero;
 
-    uint32_t steps = 8u;
-
-    sf::Clock clock;
+    sf::Clock deltaClock;
+    sf::Clock spawnClock;
 
     while (window.isOpen()) {
         ProcessEvents(window);
 
-        totalTime += deltaTime;
-        const float stepDeltaTime = deltaTime / static_cast<float>(steps);
+        const sf::Time deltaTime = deltaClock.restart();
+        accumulator += deltaTime;
 
-        if (objects.size() < 1'000 && clock.getElapsedTime().asSeconds() >= 0.025f) {
-            clock.restart();
-
-            Object object(glm::vec2(450.0f, 50.0f), dis(gen));
-            const float angle = 1.0f * glm::sin(totalTime) + 0.5f * glm::pi<float>();
-            const glm::vec2 velocity = 1'200.0f * glm::vec2(glm::cos(angle), glm::sin(angle));
-            object.position_last = object.position - (velocity * stepDeltaTime);
-            object.color = GetRainbow(totalTime);
-
-            objects.push_back(object);
-        }
-
-        for (uint32_t step = 0; step < steps; step++) {
+        while (accumulator > fixedDeltaTime) {
             for (size_t i = 0; i < objects.size(); ++i) {
                 Object &object1 = objects[i];
                 for (size_t j = i + 1; j < objects.size(); ++j) {
@@ -114,9 +102,23 @@ int main() {
                 }
                 const glm::vec2 displacement = object.position - object.position_last;
                 object.position_last = object.position;
-                object.position = object.position + displacement + object.acceleration * stepDeltaTime * stepDeltaTime;
-                object.acceleration = {};
+                object.position = object.position + displacement + object.acceleration * fixedDeltaTime.asSeconds() * fixedDeltaTime.asSeconds();
+                object.acceleration = glm::vec2(0.0f, 0.0f);
             }
+            total += fixedDeltaTime;
+            accumulator -= fixedDeltaTime;
+        }
+
+        if (objects.size() < 1'000 && spawnClock.getElapsedTime().asSeconds() >= 0.025f) {
+            spawnClock.restart();
+
+            Object object(glm::vec2(450.0f, 50.0f), dis(gen));
+            const float angle = 1.0f * glm::sin(total.asSeconds()) + 0.5f * glm::pi<float>();
+            const glm::vec2 velocity = 1'200.0f * glm::vec2(glm::cos(angle), glm::sin(angle));
+            object.position_last = object.position - (velocity * fixedDeltaTime.asSeconds());
+            object.color = GetRainbow(total.asSeconds());
+
+            objects.push_back(object);
         }
 
         window.clear(sf::Color::Black);
