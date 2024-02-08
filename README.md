@@ -14,3 +14,4 @@ Forked from https://github.com/johnBuffer/VerletSFML
 - [x] Added imgui-sfml for GUI
 - [x] Introduced Application class
 - [x] Decoupled tickrate from framerate
+- [x] Added zoom functionality
