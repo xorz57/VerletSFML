@@ -2,6 +2,9 @@
 
 Forked from https://github.com/johnBuffer/VerletSFML
 
+- [YouTube Video 1](https://www.youtube.com/watch?v=lS_qeBy3aQI)
+- [YouTube Video 2](https://www.youtube.com/watch?v=9IULfQH7E90)
+
 ## Changes
 - [x] Improved CMakeLists.txt
 - [x] Used vcpkg
