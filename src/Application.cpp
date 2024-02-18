@@ -59,18 +59,6 @@ void Application::Run() {
             accumulator -= fixedDeltaTime;
         }
 
-        if (mIsObjectSelected) {
-            const sf::Vector2i pixelPosition = sf::Mouse::getPosition(mWindow);
-            const sf::Vector2f worldPosition = mWindow.mapPixelToCoords(pixelPosition);
-            Object &selectedObject = mObjects[mSelectedObjectIndex];
-            selectedObject.position = glm::vec2(worldPosition.x, worldPosition.y);
-            const glm::vec2 dPosition = constraintPosition - selectedObject.position;
-            if (const float dRadius = constraintRadius - selectedObject.radius; glm::length(dPosition) > dRadius) {
-                selectedObject.position = constraintPosition - dRadius * glm::normalize(dPosition);
-            }
-            selectedObject.position_last = selectedObject.position;
-        }
-
         if (mObjects.size() < 1'000 && spawnClock.getElapsedTime().asSeconds() >= 0.025f) {
             spawnClock.restart();
 
@@ -104,11 +92,7 @@ void Application::Run() {
             circle2.setOrigin(object.radius, object.radius);
             circle2.setPosition(object.position.x, object.position.y);
             circle2.setFillColor(object.color);
-            if (mIsObjectSelected && &object == &mObjects[mSelectedObjectIndex]) {
-                circle2.setFillColor(sf::Color::White);
-            } else {
-                circle2.setFillColor(object.color);
-            }
+            circle2.setFillColor(object.color);
             mWindow.draw(circle2);
         }
 
@@ -137,14 +121,6 @@ void Application::ProcessEvents() {
                 HandleEventMouseWheelScrolled(event);
                 break;
 
-            case sf::Event::MouseButtonPressed:
-                HandleEventMouseButtonPressed(event);
-                break;
-
-            case sf::Event::MouseButtonReleased:
-                HandleEventMouseButtonReleased(event);
-                break;
-
             default:
                 break;
         }
@@ -168,28 +144,6 @@ void Application::HandleEventMouseWheelScrolled(const sf::Event &event) {
         mView.zoom(1.05f);
     }
     mWindow.setView(mView);
-}
-
-void Application::HandleEventMouseButtonPressed(const sf::Event &event) {
-    if (event.mouseButton.button == sf::Mouse::Left) {
-        for (size_t objectIndex = 0; objectIndex < mObjects.size(); ++objectIndex) {
-            const Object &object = mObjects[objectIndex];
-            const sf::Vector2i pixelPosition = sf::Mouse::getPosition(mWindow);
-            const sf::Vector2f worldPosition = mWindow.mapPixelToCoords(pixelPosition);
-            const float distance = glm::length(glm::vec2(worldPosition.x - object.position.x, worldPosition.y - object.position.y));
-            if (distance <= object.radius) {
-                mSelectedObjectIndex = objectIndex;
-                mIsObjectSelected = true;
-                break;
-            }
-        }
-    }
-}
-
-void Application::HandleEventMouseButtonReleased(const sf::Event &event) {
-    if (event.mouseButton.button == sf::Mouse::Left) {
-        mIsObjectSelected = false;
-    }
 }
 
 void Application::FixedUpdate(const sf::Time &fixedDeltaTime) {

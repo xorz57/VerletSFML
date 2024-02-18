@@ -36,6 +36,4 @@ private:
     glm::vec2 mGravitationalAcceleration{0.0f, 1'000.0f};
     glm::vec2 constraintPosition{450.0f, 450.0f};
     float constraintRadius{450.0f};
-    size_t mSelectedObjectIndex{0};
-    bool mIsObjectSelected{false};
 };

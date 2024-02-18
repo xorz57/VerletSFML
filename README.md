@@ -15,4 +15,3 @@ Forked from https://github.com/johnBuffer/VerletSFML
 - [x] Introduced Application class
 - [x] Decoupled tickrate from framerate
 - [x] Added zoom functionality
-- [x] Added drag functionality
