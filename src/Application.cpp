@@ -104,10 +104,10 @@ void Application::Run() {
             circle2.setOrigin(object.radius, object.radius);
             circle2.setPosition(object.position.x, object.position.y);
             circle2.setFillColor(object.color);
-            Object &selectedObject = mObjects[mSelectedObjectIndex];
-            if (mIsObjectSelected && &object == &selectedObject) {
-                circle2.setOutlineThickness(2.0f);
-                circle2.setOutlineColor(sf::Color::White);
+            if (mIsObjectSelected && &object == &mObjects[mSelectedObjectIndex]) {
+                circle2.setFillColor(sf::Color::White);
+            } else {
+                circle2.setFillColor(object.color);
             }
             mWindow.draw(circle2);
         }
