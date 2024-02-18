@@ -22,6 +22,8 @@ private:
     void HandleEventClosed(const sf::Event &event);
     void HandleEventResized(const sf::Event &event);
     void HandleEventMouseWheelScrolled(const sf::Event &event);
+    void HandleEventMouseButtonPressed(const sf::Event &event);
+    void HandleEventMouseButtonReleased(const sf::Event &event);
     void FixedUpdate(const sf::Time &fixedDeltaTime);
 
     sf::VideoMode mMode{900u, 900u};
@@ -33,5 +35,7 @@ private:
     std::vector<Object> mObjects;
     glm::vec2 mGravitationalAcceleration{0.0f, 1'000.0f};
     glm::vec2 constraintPosition{450.0f, 450.0f};
-    float constraintRadius = 450.0f;
+    float constraintRadius{450.0f};
+    size_t mSelectedObjectIndex{0};
+    bool mIsObjectSelected{false};
 };
