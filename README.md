@@ -1,9 +1,6 @@
 # VerletSFML
 
-Forked from https://github.com/johnBuffer/VerletSFML
-
-- [YouTube Video 1](https://www.youtube.com/watch?v=lS_qeBy3aQI)
-- [YouTube Video 2](https://www.youtube.com/watch?v=9IULfQH7E90)
+![image](https://github.com/xorz57/VerletSFML/assets/84932056/78b7a699-0d83-4411-a54d-53938ae0a5b8)
 
 ## Changes
 - [x] Improved CMakeLists.txt
