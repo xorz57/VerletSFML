@@ -1,5 +1,7 @@
 # VerletSFML
 
+[![Build](https://github.com/xorz57/VerletSFML/actions/workflows/Build.yml/badge.svg)](https://github.com/xorz57/VerletSFML/actions/workflows/Build.yml)
+
 ![image](https://github.com/xorz57/VerletSFML/assets/84932056/78b7a699-0d83-4411-a54d-53938ae0a5b8)
 
 ## Changes
