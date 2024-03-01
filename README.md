@@ -5,12 +5,12 @@
 ![image](https://github.com/xorz57/VerletSFML/assets/84932056/78b7a699-0d83-4411-a54d-53938ae0a5b8)
 
 ## Changes
-- [x] Improved CMakeLists.txt
-- [x] Used vcpkg
-- [x] Refactored the source code to make it way more readable by removing all abstractions
-- [x] Fixed various static analysis issues
-- [x] Added glm for everything math related
-- [x] Added imgui-sfml for GUI
-- [x] Introduced Application class
-- [x] Decoupled tickrate from framerate
-- [x] Added zoom functionality
+- [x] Enhanced CMakeLists.txt for improved project management.
+- [x] Implemented vcpkg for streamlined dependency management.
+- [x] Conducted thorough source code refactoring to enhance readability by eliminating unnecessary abstractions.
+- [x] Addressed numerous static analysis issues to improve code quality.
+- [x] Integrated glm library for comprehensive mathematical operations.
+- [x] Utilized imgui-sfml for intuitive graphical user interface (GUI) development.
+- [x] Introduced Application class for better organization and structure.
+- [x] Separated tickrate from framerate for improved performance control.
+- [x] Incorporated zoom functionality for enhanced user experience.
