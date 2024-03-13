@@ -17,6 +17,7 @@
 
 ## Dependencies
 
+- [glm](https://github.com/g-truc/glm)
 - [SFML](https://github.com/SFML/SFML)
 - [ImGui-SFML](https://github.com/SFML/imgui-sfml)
 
