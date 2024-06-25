@@ -15,16 +15,17 @@
 class Application {
 public:
     Application();
-    void Run();
+
+    void run();
 
 private:
-    void ProcessEvents();
-    void HandleEventClosed(const sf::Event &event);
-    void HandleEventResized(const sf::Event &event);
-    void HandleEventMouseWheelScrolled(const sf::Event &event);
-    void HandleEventMouseButtonPressed(const sf::Event &event);
-    void HandleEventMouseButtonReleased(const sf::Event &event);
-    void FixedUpdate(const sf::Time &fixedDeltaTime);
+    void processEvents();
+    void handleEventClosed(const sf::Event &event);
+    void handleEventResized(const sf::Event &event);
+    void handleEventMouseWheelScrolled(const sf::Event &event);
+    void handleEventMouseButtonPressed(const sf::Event &event);
+    void handleEventMouseButtonReleased(const sf::Event &event);
+    void fixedUpdate(const sf::Time &fixedDeltaTime);
 
     sf::VideoMode mMode{900u, 900u};
     sf::String mTitle{"VerletSFML"};

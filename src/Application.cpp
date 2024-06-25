@@ -34,7 +34,7 @@ Application::Application() {
     mView = mWindow.getDefaultView();
 }
 
-void Application::Run() {
+void Application::run() {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dis(1.0, 20.0);
@@ -49,12 +49,12 @@ void Application::Run() {
     sf::Clock spawnClock;
 
     while (mWindow.isOpen()) {
-        ProcessEvents();
+        processEvents();
 
         const sf::Time deltaTime = deltaClock.restart();
         accumulator += deltaTime;
         while (accumulator > fixedDeltaTime) {
-            FixedUpdate(fixedDeltaTime);
+            fixedUpdate(fixedDeltaTime);
             totalTime += fixedDeltaTime;
             accumulator -= fixedDeltaTime;
         }
@@ -104,21 +104,21 @@ void Application::Run() {
     ImGui::SFML::Shutdown();
 }
 
-void Application::ProcessEvents() {
+void Application::processEvents() {
     sf::Event event{};
     while (mWindow.pollEvent(event)) {
         ImGui::SFML::ProcessEvent(mWindow, event);
         switch (event.type) {
             case sf::Event::Closed:
-                HandleEventClosed(event);
+                handleEventClosed(event);
                 break;
 
             case sf::Event::Resized:
-                HandleEventResized(event);
+                handleEventResized(event);
                 break;
 
             case sf::Event::MouseWheelScrolled:
-                HandleEventMouseWheelScrolled(event);
+                handleEventMouseWheelScrolled(event);
                 break;
 
             default:
@@ -127,16 +127,16 @@ void Application::ProcessEvents() {
     }
 }
 
-void Application::HandleEventClosed(const sf::Event &) {
+void Application::handleEventClosed(const sf::Event &) {
     mWindow.close();
 }
 
-void Application::HandleEventResized(const sf::Event &event) {
+void Application::handleEventResized(const sf::Event &event) {
     mView.setSize(static_cast<float>(event.size.width), static_cast<float>(event.size.height));
     mWindow.setView(mView);
 }
 
-void Application::HandleEventMouseWheelScrolled(const sf::Event &event) {
+void Application::handleEventMouseWheelScrolled(const sf::Event &event) {
     if (event.mouseWheelScroll.delta > 0.0f) {
         mView.zoom(1.0f / 1.05f);
     }
@@ -146,7 +146,7 @@ void Application::HandleEventMouseWheelScrolled(const sf::Event &event) {
     mWindow.setView(mView);
 }
 
-void Application::FixedUpdate(const sf::Time &fixedDeltaTime) {
+void Application::fixedUpdate(const sf::Time &fixedDeltaTime) {
     const float dt = fixedDeltaTime.asSeconds();
     for (size_t i = 0; i < mObjects.size(); ++i) {
         Object &object1 = mObjects[i];
